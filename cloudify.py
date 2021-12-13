@@ -109,9 +109,8 @@ class CloudifyARData:
         self.debug(f'Preparing to save results to database')
 
         data = {}
-        for res in results:
-            data.append(res)
-
+        for i, res in enumerate(results):
+            data[i] = res
         db.save(data);
 
         # db.save(results)
