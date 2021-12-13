@@ -33,17 +33,15 @@ class CloudifyARData:
             self.cursor = self.mysql_db.cursor()
             self.debug(
                 f"Cursor Created")
-            self.cursor.execute("SELECT * FROM eva")
+            self.cursor.execute("SELECT JSON_ARRAYAGG(JSON_OBJECT('id', id, 'name', name, 'img_link', img_link)) from eva;")
             self.eva_results = self.cursor.fetchall()
-            for row in self.eva_results:
-                self.debug(
-                    f"Eva Row: {row}")
+            self.debug(
+                f"Eva Data: {self.eva_results}")
                     
-            self.cursor.execute("SELECT * FROM iau")
+            self.cursor.execute("SELECT JSON_ARRAYAGG(JSON_OBJECT('id', id, 'step', step, 'sub_step', sub_step, 'high_level_action', high_level_action, 'site_of_action', site_of_action, 'task_of_action', task_of_action, 'confirm_level', confirm_level, 'next_step', next_step, 'backup_step', backup_step, 'caution_level', caution_level, 'caution', caution, 'completed', completed, 'eva_id', eva_id, 'preemption_level', preemption_level, 'locked', locked)) from iau;")
             self.iau_results = self.cursor.fetchall()
-            for row in self.iau_results:
-                self.debug(
-                    f"IAU Row: {row}")
+            self.debug(
+                f"IAU Data: {self.iau_results}")
 
         except Error as e:
             self.debug(f"mysql error: {e}")
