@@ -108,7 +108,11 @@ class CloudifyARData:
                 f"Successfully connected to existing CouchDB database {dbname}")
         self.debug(f'Preparing to save results to database')
 
-        db.save(results);
+        data = {}
+        for res in results:
+            data.append(res)
+
+        db.save(data);
 
         # db.save(results)
         self.debug("Saving completed")
