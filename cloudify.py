@@ -3,12 +3,12 @@ import logging
 import time
 import json
 import os
-import numpy
+# import numpy
 import mysql.connector
 from mysql.connector import Error
 
 
-class Cloudify_AR_Data:
+class CloudifyARData:
     def __init__(self, verbose=False):
         self.setup_logging(verbose=verbose)
         self.mysql_connect()
@@ -21,22 +21,23 @@ class Cloudify_AR_Data:
     def mysql_connect(self):
         """ Connect to MySQL database """
         self.mysql_db = None
+        self.cursor = None
         try:
             self.mysql_db = mysql.connector.connect(host='localhost',
                                         database='ar_project',
                                         user='admin',
                                         password='password')
-            if self.conn.is_connected():
+            if self.mysql_db.is_connected():
                 self.debug(
                     f"Connected to MySQL")
             self.cursor = self.mysql_db.cursor()
             self.debug(
                 f"Cursor Created")
         except Error as e:
-            print(e)
+            self.debug(f"mysql error: {e}")
         finally:
-            if self.mysql_db is not None and self.is_connected():
-                self.close()
+            if self.mysql_db is not None and self.mysql_db.is_connected():
+                self.mysql_db.close()
 
     # create couchdb connection
     def couch_connect_eva(self):
@@ -69,11 +70,11 @@ class Cloudify_AR_Data:
                 f"Successfully created new CouchDB database iau")
 
     def setup_logging(self, verbose):
-        self.logger = logging.getLogger('EnergyMapReduce')
+        self.logger = logging.getLogger('CloudifyARData')
         formatter = logging.Formatter('%(prefix)s - %(message)s')
         handler = logging.StreamHandler()
         handler.setFormatter(formatter)
-        self.prefix = {'prefix': 'EnergyMapReduce'}
+        self.prefix = {'prefix': 'CloudifyARData'}
         self.logger.addHandler(handler)
         self.logger = logging.LoggerAdapter(self.logger, self.prefix)
         if verbose:
@@ -88,8 +89,9 @@ class Cloudify_AR_Data:
 
     def get_eva_data(self):
         data = []
-        self.cursor.execute("SELECT * FROM eva")
-        data = self.cursor.fetchall()
+        cursor = self.mysql_db.cursor()
+        cursor.execute("SELECT * FROM eva")
+        data = cursor.fetchall()
         for row in data:
             self.debug(
                 f"Row: {row}")
@@ -97,8 +99,9 @@ class Cloudify_AR_Data:
 
     def get_iau_data(self):
         data = []
-        self.cursor.execute("SELECT * FROM iau")
-        data = self.cursor.fetchall()
+        cursor = self.mysql_db.cursor()
+        cursor.execute("SELECT * FROM iau")
+        data = cursor.fetchall()
         for row in data:
             self.debug(
                 f"Row: {row}")
@@ -127,7 +130,7 @@ class Cloudify_AR_Data:
         self.debug("Saving completed")
 
 if __name__ == "__main__":
-    master = Cloudify_AR_Data(verbose=True)
+    master = CloudifyARData(verbose=True)
 
     eva_results = master.get_eva_data()
 
