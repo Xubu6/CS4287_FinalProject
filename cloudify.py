@@ -33,6 +33,18 @@ class CloudifyARData:
             self.cursor = self.mysql_db.cursor()
             self.debug(
                 f"Cursor Created")
+            self.cursor.execute("SELECT * FROM eva")
+            self.eva_results = self.cursor.fetchall()
+            for row in self.eva_results:
+                self.debug(
+                    f"Eva Row: {row}")
+                    
+            self.cursor.execute("SELECT * FROM iau")
+            self.iau_results = self.cursor.fetchall()
+            for row in self.iau_results:
+                self.debug(
+                    f"IAU Row: {row}")
+
         except Error as e:
             self.debug(f"mysql error: {e}")
         finally:
@@ -132,9 +144,9 @@ class CloudifyARData:
 if __name__ == "__main__":
     master = CloudifyARData(verbose=True)
 
-    eva_results = master.get_eva_data()
+    eva_results = master.eva_results
 
-    iau_results = master.get_iau_data()
+    iau_results = master.iau_results
 
     results1 = json.dumps(eva_results)
     master.debug(f'{results1}')
