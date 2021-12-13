@@ -97,27 +97,6 @@ class CloudifyARData:
     def debug(self, msg):
         self.logger.debug(msg, extra=self.prefix)
 
-
-    def get_eva_data(self):
-        data = []
-        cursor = self.mysql_db.cursor()
-        cursor.execute("SELECT * FROM eva")
-        data = cursor.fetchall()
-        for row in data:
-            self.debug(
-                f"Row: {row}")
-        return data
-
-    def get_iau_data(self):
-        data = []
-        cursor = self.mysql_db.cursor()
-        cursor.execute("SELECT * FROM iau")
-        data = cursor.fetchall()
-        for row in data:
-            self.debug(
-                f"Row: {row}")
-        return data
-
     def save_to_db(self, dbname, results):
         try:
             db = self.couchserver.create(dbname)
@@ -129,13 +108,7 @@ class CloudifyARData:
                 f"Successfully connected to existing CouchDB database {dbname}")
         self.debug(f'Preparing to save results to database')
 
-        
-        res = json.dumps(results)
-        data = {}
-        for i, res in enumerate(results):
-            data[i] = res
-
-        db.save(data);
+        db.save(results);
 
         # db.save(results)
         self.debug("Saving completed")
@@ -147,13 +120,9 @@ if __name__ == "__main__":
 
     iau_results = master.iau_results
 
-    results1 = json.dumps(eva_results)
-    master.debug(f'{results1}')
-
-    results2 = json.dumps(iau_results)
-    master.debug(f'{results2}')
+    master.debug(f"Data fetched from MySQL succesffuly!")
 
     # Save results to couchdb
-    # master.save_to_db('eva', eva_results)
-    # master.save_to_db('iau', iau_results)
+    master.save_to_db('eva', master.eva_results)
+    master.save_to_db('iau', master.iau_results)
     # master.save_to_db('average-load', avg_load_results)
