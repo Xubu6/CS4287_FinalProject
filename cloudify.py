@@ -26,7 +26,7 @@ class CloudifyARData:
             self.mysql_db = mysql.connector.connect(host='localhost',
                                         database='ar_project',
                                         user='admin',
-                                        password='password',
+                                        password='<password>',
                                         use_pure=True)
             if self.mysql_db.is_connected():
                 self.debug(
